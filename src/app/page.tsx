@@ -39,12 +39,7 @@ export default async function DashboardPage() {
         {dbError && (
           <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
             <strong>Banco de dados não configurado.</strong> Configure a variável <code className="bg-amber-100 px-1 rounded">POSTGRES_URL</code> no Vercel e acesse{' '}
-            <button
-              onClick={async () => { await fetch('/api/db', { method: 'POST' }) }}
-              className="underline"
-            >
-              /api/db
-            </button>{' '}
+            <a href="/api/db" className="underline">/api/db</a>{' '}
             para inicializar a tabela.
           </div>
         )}
