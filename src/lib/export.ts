@@ -94,7 +94,7 @@ ${ctasHtml}
     </nav>
     <footer class="foot reveal" style="animation-delay:.86s">
       <div class="copyright">
-        <a href="https://www.op7franchising.com/" target="_blank" rel="noopener">
+        <a href="https://www.instagram.com/op7franquias" target="_blank" rel="noopener">
           <img src="https://pub-db8ed4fb33634589a6ce5fb07e85cb46.r2.dev/logo/op7_dash_odc/logo_op7nexo.svg" alt="OP7 Nexo" style="display:block;height:44px;width:auto;margin:0 auto 12px;">
         </a>
         &copy; 2026 OP7 Nexo &middot; Todos os direitos reservados

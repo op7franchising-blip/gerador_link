@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getAllTemplates } from '@/lib/db'
 import { Plus, ExternalLink, Pencil, Download, Layers } from 'lucide-react'
+import DuplicateButton from '@/components/DuplicateButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -86,6 +87,7 @@ export default async function DashboardPage() {
                       <Pencil size={11} />
                       Editar
                     </Link>
+                    <DuplicateButton templateId={t.id} />
                     <a
                       href={`/${t.slug}`}
                       target="_blank"

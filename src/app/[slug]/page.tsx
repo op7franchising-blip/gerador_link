@@ -107,7 +107,7 @@ export default async function LinkBioPage({ params }: { params: Promise<{ slug: 
 
         <footer className="mt-11 flex flex-col items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <a href="https://www.op7franchising.com/" target="_blank" rel="noopener">
+          <a href="https://www.instagram.com/op7franquias" target="_blank" rel="noopener">
             <img src="https://pub-db8ed4fb33634589a6ce5fb07e85cb46.r2.dev/logo/op7_dash_odc/logo_op7nexo.svg" alt="OP7 Nexo" className="h-11 w-auto" />
           </a>
           <p className="text-[11px] text-zinc-500 tracking-wide">© 2026 OP7 Nexo · Todos os direitos reservados</p>

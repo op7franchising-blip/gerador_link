@@ -265,7 +265,9 @@ function PreviewPane({
         {/* footer */}
         <div className="mt-10 flex flex-col items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://pub-db8ed4fb33634589a6ce5fb07e85cb46.r2.dev/logo/op7_dash_odc/logo_op7nexo.svg" alt="OP7 Nexo" className="h-8 w-auto" />
+          <a href="https://www.instagram.com/op7franquias" target="_blank" rel="noopener">
+            <img src="https://pub-db8ed4fb33634589a6ce5fb07e85cb46.r2.dev/logo/op7_dash_odc/logo_op7nexo.svg" alt="OP7 Nexo" className="h-8 w-auto" />
+          </a>
           <p className="text-xs text-zinc-400">© 2026 OP7 Nexo · Todos os direitos reservados</p>
         </div>
       </div>
