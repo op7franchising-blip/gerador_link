@@ -49,6 +49,7 @@ export const ICONS = [
   { name: 'Camera', label: 'Câmera' },
   { name: 'Mic', label: 'Microfone' },
   { name: 'Headphones', label: 'Podcast' },
+  { name: 'WhatsApp', label: 'WhatsApp' },
 ] as const
 
 export type IconName = (typeof ICONS)[number]['name']

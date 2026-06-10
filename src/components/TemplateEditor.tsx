@@ -5,6 +5,7 @@ import { Save, Download, Eye, Loader2, Image } from 'lucide-react'
 import RichTextEditor from './RichTextEditor'
 import CTAEditor from './CTAEditor'
 import type { Template, CTA } from '@/lib/types'
+import { iconSvgPaths, fillIcons } from '@/lib/icon-svgs'
 
 interface Props {
   initial?: Template
@@ -12,7 +13,7 @@ interface Props {
 
 const DEFAULT_CTAS: CTA[] = [
   { id: '1', label: 'Agende uma avaliação', href: '#', icon: 'CalendarCheck' },
-  { id: '2', label: 'Entre em contato agora', href: 'https://wa.me/55', icon: 'Phone' },
+  { id: '2', label: 'Entre em contato agora', href: 'https://wa.me/55', icon: 'WhatsApp' },
   { id: '3', label: 'Ver localização', href: 'https://maps.google.com', icon: 'MapPin', meta: '' },
   { id: '4', label: 'Conheça nosso site', href: 'https://', icon: 'Globe' },
   { id: '5', label: 'Visite nossa página', href: 'https://instagram.com', icon: 'Instagram' },
@@ -28,9 +29,12 @@ export default function TemplateEditor({ initial }: Props) {
     initial?.logo_url ??
       'https://pub-db8ed4fb33634589a6ce5fb07e85cb46.r2.dev/landingpage_odc_franchising/logo_odontocompany%20(2).svg'
   )
+  const [logoWidth, setLogoWidth] = useState(initial?.logo_width ?? 170)
+  const [headline, setHeadline] = useState(initial?.headline ?? 'Cuidar do seu sorriso,')
   const [subtitleHtml, setSubtitleHtml] = useState(
     initial?.subtitle_html ?? 'é o nosso <strong>compromisso</strong>.'
   )
+  const [accentColor, setAccentColor] = useState(initial?.accent_color ?? '#A8D156')
   const [ctas, setCtas] = useState<CTA[]>(initial?.ctas ?? DEFAULT_CTAS)
 
   const autoSlug = useCallback((n: string) => {
@@ -40,7 +44,11 @@ export default function TemplateEditor({ initial }: Props) {
   async function handleSave() {
     setSaving(true)
     try {
-      const body = { name, slug: slug || autoSlug(name), logo_url: logoUrl, subtitle_html: subtitleHtml, ctas }
+      const body = {
+        name, slug: slug || autoSlug(name), logo_url: logoUrl,
+        headline, subtitle_html: subtitleHtml,
+        logo_width: logoWidth, accent_color: accentColor, ctas,
+      }
       const res = initial
         ? await fetch(`/api/templates/${initial.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
         : await fetch('/api/templates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -103,23 +111,65 @@ export default function TemplateEditor({ initial }: Props) {
             <Field label="URL da imagem">
               <input className={input} value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://..." />
             </Field>
-            {logoUrl && (
+            <Field label="Largura (px)">
+              <div className="flex items-center gap-2">
+                <input
+                  type="range" min={60} max={380} step={10}
+                  value={logoWidth}
+                  onChange={(e) => setLogoWidth(Number(e.target.value))}
+                  className="flex-1 accent-brand-green"
+                />
+                <span className="text-xs text-zinc-500 w-12 text-right">{logoWidth}px</span>
+              </div>
+            </Field>
+            {logoUrl ? (
               <div className="mt-2 flex justify-center p-3 bg-white rounded-lg border border-zinc-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={logoUrl} alt="preview" className="max-h-20 max-w-full object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                <img src={logoUrl} alt="preview" style={{ width: logoWidth, height: 'auto' }} className="object-contain max-h-24" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
               </div>
-            )}
-            {!logoUrl && (
+            ) : (
               <div className="flex items-center justify-center h-16 bg-white rounded-lg border border-dashed border-zinc-200 text-zinc-300">
                 <Image size={24} />
               </div>
             )}
           </Section>
 
+          {/* Headline */}
+          <Section title="Título principal">
+            <Field label="Texto do título">
+              <input
+                className={input}
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
+                placeholder="Ex: Cuidar do seu sorriso,"
+              />
+            </Field>
+          </Section>
+
           {/* Subtitle */}
-          <Section title="Texto / Subtítulo">
+          <Section title="Subtítulo">
             <p className="text-xs text-zinc-400 mb-2">Suporta HTML. Use negrito, cores e tamanho.</p>
             <RichTextEditor value={subtitleHtml} onChange={setSubtitleHtml} placeholder="Ex: é o nosso compromisso." />
+          </Section>
+
+          {/* Accent color */}
+          <Section title="Cor de destaque (hover)">
+            <Field label="Cor do ícone e borda no hover">
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  className="w-10 h-9 rounded-lg border border-zinc-200 cursor-pointer p-0.5 bg-white"
+                />
+                <input
+                  className={`${input} flex-1`}
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  placeholder="#A8D156"
+                />
+              </div>
+            </Field>
           </Section>
 
           {/* CTAs */}
@@ -134,7 +184,7 @@ export default function TemplateEditor({ initial }: Props) {
       <div className="flex-1 overflow-hidden bg-zinc-100">
         <div className="h-full overflow-y-auto flex items-start justify-center p-8">
           <div className="bg-[#f3f3f1] rounded-2xl shadow-xl overflow-hidden w-full max-w-[390px] min-h-[600px]" style={{ fontFamily: 'system-ui, sans-serif' }}>
-            <PreviewPane logo={logoUrl} subtitleHtml={subtitleHtml} ctas={ctas} name={name} />
+            <PreviewPane logo={logoUrl} logoWidth={logoWidth} headline={headline} subtitleHtml={subtitleHtml} ctas={ctas} name={name} accentColor={accentColor} />
           </div>
         </div>
       </div>
@@ -142,36 +192,66 @@ export default function TemplateEditor({ initial }: Props) {
   )
 }
 
-function PreviewPane({ logo, subtitleHtml, ctas, name }: { logo: string; subtitleHtml: string; ctas: CTA[]; name: string }) {
+function CtaIconPreview({ iconName }: { iconName: string }) {
+  const paths = iconSvgPaths[iconName] ?? iconSvgPaths['Link']
+  const isFill = fillIcons.has(iconName)
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill={isFill ? 'currentColor' : 'none'}
+      stroke={isFill ? 'none' : 'currentColor'}
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ width: 18, height: 18 }}
+      dangerouslySetInnerHTML={{ __html: paths }}
+    />
+  )
+}
+
+function PreviewPane({
+  logo, logoWidth, headline, subtitleHtml, ctas, name, accentColor,
+}: {
+  logo: string; logoWidth: number; headline: string; subtitleHtml: string
+  ctas: CTA[]; name: string; accentColor: string
+}) {
   return (
     <div className="relative min-h-[600px] bg-[#f3f3f1]">
+      <style>{`
+        .prev-link:hover { border-color: ${accentColor}; }
+        .prev-link:hover .prev-ico { background: ${accentColor}; border-color: ${accentColor}; color: #fff; }
+      `}</style>
       {/* ambient */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-72 h-72 rounded-full blur-3xl opacity-30" style={{ background: '#A8D156', top: -80, left: -80 }} />
-        <div className="absolute w-72 h-72 rounded-full blur-3xl opacity-25" style={{ background: '#A8D156', bottom: -80, right: -80 }} />
+        <div className="absolute w-72 h-72 rounded-full blur-3xl opacity-30" style={{ background: accentColor, top: -80, left: -80 }} />
+        <div className="absolute w-72 h-72 rounded-full blur-3xl opacity-25" style={{ background: accentColor, bottom: -80, right: -80 }} />
       </div>
 
       <div className="relative z-10 flex flex-col items-center text-center px-5 pt-10 pb-12">
         {/* logo */}
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={name} className="mb-4 object-contain" style={{ width: 170, height: 'auto' }} />
+          <img src={logo} alt={name} className="mb-4 object-contain" style={{ width: logoWidth, height: 'auto' }} />
         ) : (
           <div className="w-24 h-24 rounded-2xl bg-zinc-200 mb-4 flex items-center justify-center text-zinc-400 text-xs">Logo</div>
         )}
 
         {/* headline */}
         <h1 className="font-semibold mb-1" style={{ fontSize: 22, color: '#2E7370', lineHeight: 1.1 }}>
-          Cuidar do seu sorriso,
+          {headline}
         </h1>
         <p className="mb-6 text-sm" style={{ color: '#2E7370', maxWidth: 280 }} dangerouslySetInnerHTML={{ __html: subtitleHtml }} />
 
         {/* CTAs */}
         <div className="w-full space-y-2.5">
           {ctas.map((cta) => (
-            <div key={cta.id} className="flex items-center gap-3 px-3 py-2.5 rounded-full bg-white border border-zinc-100 shadow-sm text-left cursor-default hover:shadow-md transition-shadow">
-              <div className="w-9 h-9 rounded-full bg-zinc-100 flex items-center justify-center flex-shrink-0 text-zinc-600 text-sm">
-                {cta.icon.charAt(0)}
+            <div
+              key={cta.id}
+              className="prev-link flex items-center gap-3 px-3 py-2.5 rounded-full bg-white border border-zinc-100 shadow-sm text-left cursor-default transition-colors"
+              style={{ borderWidth: 1, transition: 'border-color .2s' }}
+            >
+              <div className="prev-ico w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center flex-shrink-0 text-zinc-600 transition-colors" style={{ transition: 'background .2s, border-color .2s, color .2s' }}>
+                <CtaIconPreview iconName={cta.icon} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-zinc-800 truncate">{cta.label}</div>
@@ -183,7 +263,7 @@ function PreviewPane({ logo, subtitleHtml, ctas, name }: { logo: string; subtitl
         </div>
 
         {/* footer */}
-        <div className="mt-10 flex flex-col items-center gap-2 opacity-60">
+        <div className="mt-10 flex flex-col items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="https://pub-db8ed4fb33634589a6ce5fb07e85cb46.r2.dev/logo/op7_dash_odc/logo_op7nexo.svg" alt="OP7 Nexo" className="h-8 w-auto" />
           <p className="text-xs text-zinc-400">© 2026 OP7 Nexo · Todos os direitos reservados</p>
