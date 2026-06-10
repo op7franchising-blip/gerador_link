@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { getAllTemplates } from '@/lib/db'
-import { Plus, ExternalLink, Pencil, Download, Layers } from 'lucide-react'
+import { Plus, ExternalLink, Pencil, Download, Layers, Copy } from 'lucide-react'
 import DuplicateButton from '@/components/DuplicateButton'
+import DeleteButton from '@/components/DeleteButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,9 +40,9 @@ export default async function DashboardPage() {
       <main className="max-w-5xl mx-auto px-6 py-10">
         {dbError && (
           <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-            <strong>Banco de dados não configurado.</strong> Configure a variável <code className="bg-amber-100 px-1 rounded">POSTGRES_URL</code> no Vercel e acesse{' '}
-            <a href="/api/db" className="underline">/api/db</a>{' '}
-            para inicializar a tabela.
+            <strong>Banco de dados não configurado.</strong> Acesse{' '}
+            <a href="/api/db" className="underline font-medium">/api/db</a>{' '}
+            para inicializar/migrar a tabela.
           </div>
         )}
 
@@ -63,26 +64,28 @@ export default async function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {templates.map((t) => (
-              <div key={t.id} className="bg-white rounded-2xl border border-zinc-200 overflow-hidden hover:shadow-md transition-shadow">
+              <div key={t.id} className="bg-white rounded-2xl border border-zinc-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
                 {/* Preview strip */}
-                <div className="h-20 bg-[#f3f3f1] flex items-center justify-center overflow-hidden relative">
-                  <div className="absolute w-32 h-32 rounded-full opacity-20" style={{ background: '#A8D156', filter: 'blur(40px)', top: -16, left: -16 }} />
+                <div className="h-24 bg-[#f3f3f1] flex items-center justify-center overflow-hidden relative flex-shrink-0">
+                  <div className="absolute w-32 h-32 rounded-full opacity-20" style={{ background: t.accent_color ?? '#A8D156', filter: 'blur(40px)', top: -16, left: -16 }} />
                   {t.logo_url
                     // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={t.logo_url} alt={t.name} className="relative z-10 max-h-12 max-w-[140px] object-contain" />
+                    ? <img src={t.logo_url} alt={t.name} className="relative z-10 max-h-14 max-w-[150px] object-contain" />
                     : <span className="text-zinc-300 text-xs">sem logo</span>
                   }
+                  <DeleteButton templateId={t.id} templateName={t.name} />
                 </div>
 
-                <div className="p-4">
+                <div className="p-4 flex flex-col flex-1">
                   <h3 className="font-semibold text-zinc-800 truncate">{t.name}</h3>
                   <p className="text-xs text-zinc-400 mt-0.5 truncate">/{t.slug}</p>
                   <p className="text-xs text-zinc-400 mt-1">{Array.isArray(t.ctas) ? t.ctas.length : 0} CTAs</p>
 
-                  <div className="flex items-center gap-2 mt-4">
+                  {/* Buttons — 2×2 symmetric grid */}
+                  <div className="grid grid-cols-2 gap-1.5 mt-4">
                     <Link
                       href={`/editor/${t.id}`}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-brand-dark text-white text-xs font-medium hover:bg-teal-800 transition-colors"
+                      className="flex items-center justify-center gap-1.5 py-2 rounded-lg bg-brand-dark text-white text-xs font-medium hover:bg-teal-800 transition-colors"
                     >
                       <Pencil size={11} />
                       Editar
@@ -91,14 +94,14 @@ export default async function DashboardPage() {
                     <a
                       href={`/${t.slug}`}
                       target="_blank"
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 text-xs text-zinc-600 hover:border-zinc-300 transition-colors"
+                      className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-zinc-200 text-xs text-zinc-600 hover:border-zinc-300 transition-colors"
                     >
                       <ExternalLink size={11} />
                       Ver
                     </a>
                     <a
                       href={`/api/export/${t.id}`}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 text-xs text-zinc-600 hover:border-zinc-300 transition-colors"
+                      className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-zinc-200 text-xs text-zinc-600 hover:border-zinc-300 transition-colors"
                     >
                       <Download size={11} />
                       HTML

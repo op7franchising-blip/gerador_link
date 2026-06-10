@@ -44,7 +44,7 @@ export default function DuplicateButton({ templateId }: Props) {
     <button
       onClick={handle}
       disabled={loading}
-      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 text-xs text-zinc-600 hover:border-zinc-300 transition-colors disabled:opacity-50"
+      className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg border border-zinc-200 text-xs text-zinc-600 hover:border-zinc-300 transition-colors disabled:opacity-50"
     >
       {loading ? <Loader2 size={11} className="animate-spin" /> : <Copy size={11} />}
       Duplicar
