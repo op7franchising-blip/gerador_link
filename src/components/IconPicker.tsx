@@ -19,7 +19,7 @@ export default function IconPicker({ value, onChange }: Props) {
       i.label.toLowerCase().includes(q.toLowerCase())
   )
 
-  const IconComp = (LucideIcons as Record<string, React.ComponentType<{ size?: number }>>)[value]
+  const IconComp = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number }>>)[value]
 
   return (
     <div className="relative">
@@ -47,7 +47,7 @@ export default function IconPicker({ value, onChange }: Props) {
           </div>
           <div className="grid grid-cols-5 gap-1 max-h-52 overflow-y-auto">
             {filtered.map((icon) => {
-              const Ic = (LucideIcons as Record<string, React.ComponentType<{ size?: number }>>)[icon.name]
+              const Ic = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number }>>)[icon.name]
               if (!Ic) return null
               return (
                 <button
