@@ -12,7 +12,7 @@
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@vercel/postgres": "^0.10.0",
+    "@neondatabase/serverless": "^0.10.4",
     "lucide-react": "^0.468.0",
     "uuid": "^11.0.3"
   },

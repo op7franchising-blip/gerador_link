@@ -1,7 +1,14 @@
-import { sql } from '@vercel/postgres'
+import { neon } from '@neondatabase/serverless'
 import type { Template, TemplateInput } from './types'
 
+function getDb() {
+  const url = process.env.DATABASE_URL
+  if (!url) throw new Error('DATABASE_URL not set')
+  return neon(url)
+}
+
 export async function initDb() {
+  const sql = getDb()
   await sql`
     CREATE TABLE IF NOT EXISTS templates (
       id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -17,39 +24,38 @@ export async function initDb() {
 }
 
 export async function getAllTemplates(): Promise<Template[]> {
-  const { rows } = await sql`
-    SELECT * FROM templates ORDER BY updated_at DESC
-  `
-  return rows as Template[]
+  const sql = getDb()
+  const rows = await sql`SELECT * FROM templates ORDER BY updated_at DESC`
+  return rows as unknown as Template[]
 }
 
 export async function getTemplateById(id: string): Promise<Template | null> {
-  const { rows } = await sql`
-    SELECT * FROM templates WHERE id = ${id}
-  `
-  return (rows[0] as Template) ?? null
+  const sql = getDb()
+  const rows = await sql`SELECT * FROM templates WHERE id = ${id}`
+  return (rows[0] as unknown as Template) ?? null
 }
 
 export async function getTemplateBySlug(slug: string): Promise<Template | null> {
-  const { rows } = await sql`
-    SELECT * FROM templates WHERE slug = ${slug}
-  `
-  return (rows[0] as Template) ?? null
+  const sql = getDb()
+  const rows = await sql`SELECT * FROM templates WHERE slug = ${slug}`
+  return (rows[0] as unknown as Template) ?? null
 }
 
 export async function createTemplate(data: TemplateInput): Promise<Template> {
+  const sql = getDb()
   const ctasJson = JSON.stringify(data.ctas)
-  const { rows } = await sql`
+  const rows = await sql`
     INSERT INTO templates (slug, name, logo_url, subtitle_html, ctas)
     VALUES (${data.slug}, ${data.name}, ${data.logo_url}, ${data.subtitle_html}, ${ctasJson}::jsonb)
     RETURNING *
   `
-  return rows[0] as Template
+  return rows[0] as unknown as Template
 }
 
 export async function updateTemplate(id: string, data: Partial<TemplateInput>): Promise<Template | null> {
+  const sql = getDb()
   const ctasJson = data.ctas !== undefined ? JSON.stringify(data.ctas) : undefined
-  const { rows } = await sql`
+  const rows = await sql`
     UPDATE templates SET
       slug          = COALESCE(${data.slug ?? null}, slug),
       name          = COALESCE(${data.name ?? null}, name),
@@ -60,9 +66,10 @@ export async function updateTemplate(id: string, data: Partial<TemplateInput>): 
     WHERE id = ${id}
     RETURNING *
   `
-  return (rows[0] as Template) ?? null
+  return (rows[0] as unknown as Template) ?? null
 }
 
 export async function deleteTemplate(id: string): Promise<void> {
+  const sql = getDb()
   await sql`DELETE FROM templates WHERE id = ${id}`
 }
