@@ -1,6 +1,10 @@
 import type { Template } from './types'
 import { iconSvgPaths, fillIcons } from './icon-svgs'
 
+const FOOTER_LOGO_DEFAULT = 'https://pub-db8ed4fb33634589a6ce5fb07e85cb46.r2.dev/logo/op7_dash_odc/logo_op7nexo.svg'
+const FOOTER_HREF_DEFAULT = 'https://www.instagram.com/op7franquias'
+const FOOTER_COPYRIGHT_DEFAULT = '© 2026 OP7 Nexo · Todos os direitos reservados'
+
 function ctaIconSvg(iconName: string): string {
   const paths = iconSvgPaths[iconName] ?? iconSvgPaths['Link']
   if (fillIcons.has(iconName)) {
@@ -10,11 +14,34 @@ function ctaIconSvg(iconName: string): string {
 }
 
 const arrowSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M9 7h8v8"/></svg>`
+const arrowSvg02 = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>`
 
 export function generateHtml(t: Template): string {
+  if (t.template_type === 'modelo02') return generateHtml02(t)
+  return generateHtml01(t)
+}
+
+function footerLogoHtml(t: Template, heightPx: number): string {
+  const url = t.footer_logo_url || FOOTER_LOGO_DEFAULT
+  const href = t.footer_logo_href || FOOTER_HREF_DEFAULT
+  const img = `<img src="${escHtml(url)}" alt="logo" style="display:block;height:${heightPx}px;width:auto;margin:0 auto 12px;">`
+  if (href) return `<a href="${escHtml(href)}" target="_blank" rel="noopener">${img}</a>`
+  return img
+}
+
+function headerLogoHtml(t: Template, logoWidth: number): string {
+  const img = `<img src="${escHtml(t.logo_url)}" alt="${escHtml(t.name)}" style="width:${logoWidth}px;height:auto;display:block;">`
+  if (t.logo_href) return `<a href="${escHtml(t.logo_href)}" target="_blank" rel="noopener noreferrer">${img}</a>`
+  return img
+}
+
+// ── Modelo 01 export ──
+function generateHtml01(t: Template): string {
   const accent = t.accent_color ?? '#A8D156'
   const logoWidth = t.logo_width ?? 170
   const headline = t.headline ?? 'Cuidar do seu sorriso,'
+  const footerLogoWidth = t.footer_logo_width ?? 44
+  const footerCopyright = t.footer_copyright || FOOTER_COPYRIGHT_DEFAULT
 
   const ctasHtml = t.ctas.map((cta, i) => `
       <a class="link" href="${escHtml(cta.href)}" target="_blank" rel="noopener" style="animation-delay:${(0.34 + i * 0.08).toFixed(2)}s">
@@ -84,7 +111,7 @@ export function generateHtml(t: Template): string {
   <main>
     <header class="header">
       <div class="avatar reveal" style="animation-delay:.05s" aria-hidden="true">
-        <img src="${escHtml(t.logo_url)}" alt="${escHtml(t.name)}" style="width:100%;height:auto;display:block;">
+        ${headerLogoHtml(t, logoWidth)}
       </div>
       <h1 class="reveal" style="animation-delay:.18s">${escHtml(headline)}</h1>
       <p class="tagline reveal" style="animation-delay:.24s">${t.subtitle_html}</p>
@@ -94,13 +121,217 @@ ${ctasHtml}
     </nav>
     <footer class="foot reveal" style="animation-delay:.86s">
       <div class="copyright">
-        <a href="https://www.instagram.com/op7franquias" target="_blank" rel="noopener">
-          <img src="https://pub-db8ed4fb33634589a6ce5fb07e85cb46.r2.dev/logo/op7_dash_odc/logo_op7nexo.svg" alt="OP7 Nexo" style="display:block;height:44px;width:auto;margin:0 auto 12px;">
-        </a>
-        &copy; 2026 OP7 Nexo &middot; Todos os direitos reservados
+        ${footerLogoHtml(t, footerLogoWidth)}
+        &copy; ${escHtml(footerCopyright.replace('©', '').trim())}
       </div>
     </footer>
   </main>
+</body>
+</html>`
+}
+
+// ── Modelo 02 export ──
+function generateHtml02(t: Template): string {
+  const accent = t.accent_color ?? '#035dd7'
+  const secondary = t.secondary_color ?? '#f15a24'
+  const logoWidth = t.logo_width ?? 132
+  const headline = t.headline ?? 'Transforme seus resultados.'
+  const brandName = t.brand_name ?? ''
+  const handle = t.handle ?? ''
+  const footerLogoWidth = t.footer_logo_width ?? 44
+  const footerCopyright = t.footer_copyright || FOOTER_COPYRIGHT_DEFAULT
+
+  const ctasHtml = t.ctas.map((cta) => {
+    const style = cta.style ?? 'light'
+    const cls = style === 'dark' ? 'card dark' : style === 'accent' ? 'card accent-card' : 'card light'
+    return `
+    <a class="${cls}" href="${escHtml(cta.href)}" target="_blank" rel="noopener noreferrer">
+      <span class="icon">${ctaIconSvg(cta.icon)}</span>
+      <span class="card-text">
+        <div class="card-title">${escHtml(cta.label)}</div>
+        ${cta.meta ? `<div class="card-sub">${escHtml(cta.meta)}</div>` : ''}
+      </span>
+      <span class="arrow">${arrowSvg02}</span>
+    </a>`
+  }).join('\n')
+
+  const handleRowHtml = (brandName || handle) ? `
+  <div class="handle-row">
+    ${brandName ? `<span class="brand-name">${escHtml(brandName)}</span>` : ''}
+    ${handle ? `<span class="handle">${escHtml(handle)}</span>` : ''}
+  </div>` : ''
+
+  const ctaCount = String(t.ctas.length).padStart(2, '0')
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escHtml(t.name)}</title>
+<style>
+  :root {
+    --blue-deep: #0a3a8c;
+    --blue-main: ${accent};
+    --orange: ${secondary};
+    --ink: #0c1b33;
+    --paper: #f4f7fc;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(160deg, #eaf1fd 0%, #dbe9fb 35%, #eef3fb 70%, #ffffff 100%);
+    background-image:
+      linear-gradient(160deg, #eaf1fd 0%, #dbe9fb 35%, #eef3fb 70%, #ffffff 100%),
+      repeating-linear-gradient(0deg, rgba(10,58,140,0.05) 0px, rgba(10,58,140,0.05) 1px, transparent 1px, transparent 48px),
+      repeating-linear-gradient(90deg, rgba(10,58,140,0.05) 0px, rgba(10,58,140,0.05) 1px, transparent 1px, transparent 48px);
+    color: var(--ink);
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+  }
+  .wrap {
+    width: 100%;
+    max-width: 460px;
+    padding: 40px 20px 50px;
+    position: relative;
+  }
+  .logo-shell {
+    width: ${logoWidth}px; height:${logoWidth}px;
+    margin: 8px auto 22px;
+    display:flex; align-items:center; justify-content:center;
+    filter: drop-shadow(0 18px 32px rgba(10,58,140,0.28));
+  }
+  .logo-shell img { width: 100%; height:100%; object-fit:contain; }
+  .handle-row {
+    display:flex; align-items:center; justify-content:center;
+    gap:10px; margin-bottom: 18px;
+    font-size: 14px;
+  }
+  .brand-name { color:#5b6b85; letter-spacing:0.2px; }
+  .handle {
+    background: rgba(3,93,215,0.1);
+    color: var(--blue-main);
+    font-weight:700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size:13px;
+  }
+  h1.hero {
+    text-align:center;
+    font-size: clamp(1.4rem, 8vw, 1.9rem);
+    line-height:1.15;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  p.sub {
+    text-align:center;
+    font-size: 1.02rem;
+    color:#5b6b85;
+    line-height:1.5;
+    max-width: 360px;
+    margin: 0 auto 36px;
+  }
+  p.sub strong { color: var(--ink); font-weight:700; }
+  .section-label {
+    display:flex; align-items:center; gap:14px;
+    margin-bottom: 18px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight:700;
+    color:#8a97ad;
+  }
+  .section-label .rule {
+    flex:1; height:1px;
+    background: linear-gradient(90deg, rgba(10,58,140,0.25), rgba(10,58,140,0.06));
+  }
+  .links { display:flex; flex-direction:column; gap:14px; }
+  .card {
+    display:flex; align-items:center; gap:14px;
+    padding: 16px 18px;
+    border-radius: 999px;
+    text-decoration:none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .card:active { transform: scale(0.98); }
+  .card.light {
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(10,58,140,0.08);
+    color: var(--ink);
+  }
+  .card.dark {
+    background: linear-gradient(150deg, ${accent}bb 0%, ${accent} 50%, ${accent}dd 100%);
+    color: #ffffff;
+    box-shadow: 0 14px 30px ${accent}44, inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .card.accent-card {
+    background: linear-gradient(150deg, ${secondary}cc 0%, ${secondary} 50%, ${secondary}dd 100%);
+    color: #ffffff;
+    box-shadow: 0 14px 30px ${secondary}44, inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .card.dark::before,
+  .card.accent-card::before {
+    content:'';
+    position:absolute;
+    top:0; left:0; right:0; bottom:0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0) 65%);
+    pointer-events:none;
+  }
+  .icon {
+    width: 46px; height:46px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    position:relative; z-index:2;
+  }
+  .card.light .icon { background: rgba(3,93,215,0.08); color: var(--blue-main); }
+  .card.dark .icon, .card.accent-card .icon { background: rgba(255,255,255,0.18); color:#fff; }
+  .icon svg { width:21px; height:21px; }
+  .card-text { flex:1; min-width:0; position:relative; z-index:2; }
+  .card-title { font-weight:700; font-size:1.02rem; margin-bottom:2px; letter-spacing:-0.1px; }
+  .card-sub { font-size:0.86rem; opacity:0.72; }
+  .card.dark .card-sub, .card.accent-card .card-sub { opacity:0.85; }
+  .arrow {
+    width: 38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    position:relative; z-index:2;
+  }
+  .card.light .arrow { background:#f1f4fa; color:#5b6b85; }
+  .card.dark .arrow, .card.accent-card .arrow { background: rgba(255,255,255,0.18); color:#fff; }
+  .arrow svg { width:16px; height:16px; }
+  footer {
+    text-align:center;
+    margin-top: 44px;
+    font-size: 0.78rem;
+    color:#9aa6ba;
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo-shell">
+    ${headerLogoHtml(t, logoWidth)}
+  </div>
+  ${handleRowHtml}
+  <h1 class="hero">${escHtml(headline)}</h1>
+  <p class="sub">${t.subtitle_html}</p>
+  <div class="section-label">
+    LINKS <span class="rule"></span> ${ctaCount}
+  </div>
+  <div class="links">
+${ctasHtml}
+  </div>
+  <footer>
+    ${footerLogoHtml(t, footerLogoWidth)}
+    ${escHtml(footerCopyright)}
+  </footer>
+</div>
 </body>
 </html>`
 }

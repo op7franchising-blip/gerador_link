@@ -19,11 +19,20 @@ export default function DuplicateButton({ templateId }: Props) {
       const copy = {
         name: `${data.name} (cópia)`,
         slug: `${data.slug}-${suffix}`,
+        template_type: data.template_type ?? 'modelo01',
         logo_url: data.logo_url,
+        logo_href: data.logo_href ?? '',
         headline: data.headline ?? 'Cuidar do seu sorriso,',
         subtitle_html: data.subtitle_html,
         logo_width: data.logo_width ?? 170,
         accent_color: data.accent_color ?? '#A8D156',
+        secondary_color: data.secondary_color ?? '#f15a24',
+        brand_name: data.brand_name ?? '',
+        handle: data.handle ?? '',
+        footer_logo_url: data.footer_logo_url ?? '',
+        footer_logo_href: data.footer_logo_href ?? '',
+        footer_logo_width: data.footer_logo_width ?? 44,
+        footer_copyright: data.footer_copyright ?? '',
         ctas: data.ctas,
       }
       const r2 = await fetch('/api/templates', {

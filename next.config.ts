@@ -4,6 +4,14 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '**' }],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/:slug([^/]+\\.[^/]+)',
+        destination: '/:slug',
+      },
+    ]
+  },
 }
 
 export default nextConfig

@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { getAllTemplates } from '@/lib/db'
-import { Plus, ExternalLink, Pencil, Download, Layers, Copy } from 'lucide-react'
+import { ExternalLink, Pencil, Download, Layers, Copy, ChevronDown } from 'lucide-react'
 import DuplicateButton from '@/components/DuplicateButton'
 import DeleteButton from '@/components/DeleteButton'
+import NewTemplateDropdown from '@/components/NewTemplateDropdown'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,13 +28,7 @@ export default async function DashboardPage() {
         <span className="text-zinc-300">|</span>
         <span className="text-sm text-zinc-400">OP7 Nexo</span>
         <div className="ml-auto">
-          <Link
-            href="/editor/new"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand-dark text-white text-sm font-medium hover:bg-teal-800 transition-colors"
-          >
-            <Plus size={14} />
-            Novo template
-          </Link>
+          <NewTemplateDropdown />
         </div>
       </header>
 
@@ -57,7 +52,7 @@ export default async function DashboardPage() {
               <Layers size={24} className="text-zinc-300" />
             </div>
             <p className="text-zinc-500 text-sm mb-4">Nenhum template ainda.</p>
-            <Link href="/editor/new" className="text-brand-dark text-sm font-medium hover:underline">
+            <Link href="/editor/new?type=modelo01" className="text-brand-dark text-sm font-medium hover:underline">
               Criar o primeiro →
             </Link>
           </div>
@@ -73,6 +68,10 @@ export default async function DashboardPage() {
                     ? <img src={t.logo_url} alt={t.name} className="relative z-10 max-h-14 max-w-[150px] object-contain" />
                     : <span className="text-zinc-300 text-xs">sem logo</span>
                   }
+                  {/* Template type badge */}
+                  <span className={`absolute top-2 left-2 z-10 text-[10px] font-bold px-1.5 py-0.5 rounded-md ${t.template_type === 'modelo02' ? 'bg-blue-600 text-white' : 'bg-zinc-700 text-white'}`}>
+                    {t.template_type === 'modelo02' ? 'M2' : 'M1'}
+                  </span>
                   <DeleteButton templateId={t.id} templateName={t.name} />
                 </div>
 

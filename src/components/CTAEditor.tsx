@@ -7,11 +7,14 @@ import { v4 as uuidv4 } from 'uuid'
 interface Props {
   ctas: CTA[]
   onChange: (ctas: CTA[]) => void
+  showStyle?: boolean
 }
 
-export default function CTAEditor({ ctas, onChange }: Props) {
+export default function CTAEditor({ ctas, onChange, showStyle }: Props) {
   function add() {
-    onChange([...ctas, { id: uuidv4(), label: 'Novo link', href: 'https://', icon: 'Link' }])
+    const newCta: CTA = { id: uuidv4(), label: 'Novo link', href: 'https://', icon: 'Link' }
+    if (showStyle) newCta.style = 'light'
+    onChange([...ctas, newCta])
   }
 
   function remove(id: string) {
@@ -87,9 +90,25 @@ export default function CTAEditor({ ctas, onChange }: Props) {
             />
           </div>
 
-          <div>
-            <label className="block text-xs text-zinc-500 mb-1">Ícone</label>
-            <IconPicker value={cta.icon} onChange={(icon) => update(cta.id, { icon })} />
+          <div className={showStyle ? 'grid grid-cols-2 gap-2' : ''}>
+            <div>
+              <label className="block text-xs text-zinc-500 mb-1">Ícone</label>
+              <IconPicker value={cta.icon} onChange={(icon) => update(cta.id, { icon })} />
+            </div>
+            {showStyle && (
+              <div>
+                <label className="block text-xs text-zinc-500 mb-1">Estilo do card</label>
+                <select
+                  className="w-full text-sm px-2.5 py-1.5 rounded-lg border border-zinc-200 focus:border-brand-green outline-none bg-white"
+                  value={cta.style ?? 'light'}
+                  onChange={(e) => update(cta.id, { style: e.target.value as CTA['style'] })}
+                >
+                  <option value="light">Claro (branco)</option>
+                  <option value="dark">Escuro (azul)</option>
+                  <option value="accent">Destaque (laranja)</option>
+                </select>
+              </div>
+            )}
           </div>
         </div>
       ))}
