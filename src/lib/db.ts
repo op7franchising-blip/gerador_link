@@ -43,6 +43,18 @@ export async function initDb() {
   await sql`ALTER TABLE templates ADD COLUMN IF NOT EXISTS footer_copyright TEXT NOT NULL DEFAULT '© 2026 OP7 Nexo · Todos os direitos reservados'`
 }
 
+// Run migrations once per server instance, before any write.
+let migrated: Promise<void> | null = null
+function ensureMigrated() {
+  if (!migrated) {
+    migrated = initDb().catch((e) => {
+      migrated = null // allow retry on next write if init failed
+      throw e
+    })
+  }
+  return migrated
+}
+
 export async function getAllTemplates(): Promise<Template[]> {
   const sql = getDb()
   const rows = await sql`SELECT * FROM templates ORDER BY updated_at DESC`
@@ -62,6 +74,7 @@ export async function getTemplateBySlug(slug: string): Promise<Template | null> 
 }
 
 export async function createTemplate(data: TemplateInput): Promise<Template> {
+  await ensureMigrated()
   const sql = getDb()
   const ctasJson = JSON.stringify(data.ctas)
   const rows = await sql`
@@ -92,6 +105,7 @@ export async function createTemplate(data: TemplateInput): Promise<Template> {
 }
 
 export async function updateTemplate(id: string, data: Partial<TemplateInput>): Promise<Template | null> {
+  await ensureMigrated()
   const sql = getDb()
   const ctasJson = data.ctas !== undefined ? JSON.stringify(data.ctas) : undefined
   const rows = await sql`
