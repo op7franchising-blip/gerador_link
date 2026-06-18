@@ -181,20 +181,22 @@ function generateHtml02(t: Template): string {
   body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     background: linear-gradient(160deg, #eaf1fd 0%, #dbe9fb 35%, #eef3fb 70%, #ffffff 100%);
-    background-image:
-      linear-gradient(160deg, #eaf1fd 0%, #dbe9fb 35%, #eef3fb 70%, #ffffff 100%),
-      repeating-linear-gradient(0deg, rgba(10,58,140,0.05) 0px, rgba(10,58,140,0.05) 1px, transparent 1px, transparent 48px),
-      repeating-linear-gradient(90deg, rgba(10,58,140,0.05) 0px, rgba(10,58,140,0.05) 1px, transparent 1px, transparent 48px);
     color: var(--ink);
     min-height: 100vh;
     display:flex;
     justify-content:center;
   }
+  .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(to right,rgba(10,58,140,0.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(10,58,140,0.05) 1px,transparent 1px);
+    background-size:56px 56px;background-position:-1px -1px;
+    mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 40%,transparent 100%);
+    -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 40%,transparent 100%)}
   .wrap {
     width: 100%;
     max-width: 460px;
     padding: 40px 20px 50px;
     position: relative;
+    z-index: 1;
   }
   .logo-shell {
     width: ${logoWidth}px; height:${logoWidth}px;
@@ -314,6 +316,7 @@ function generateHtml02(t: Template): string {
 </style>
 </head>
 <body>
+<div class="grid-bg" aria-hidden="true"></div>
 <div class="wrap">
   <div class="logo-shell">
     ${headerLogoHtml(t, logoWidth)}

@@ -356,7 +356,14 @@ function PreviewPane02({ logo, logoWidth, logoHref, headline, subtitleHtml, ctas
   footerLogoUrl: string; footerLogoHref: string; footerLogoWidth: number; footerCopyright: string
 }) {
   return (
-    <div className="relative min-h-[600px]" style={{ background: 'linear-gradient(160deg,#eaf1fd 0%,#dbe9fb 35%,#eef3fb 70%,#fff 100%)' }}>
+    <div className="relative min-h-[600px] overflow-hidden" style={{ background: 'linear-gradient(160deg,#eaf1fd 0%,#dbe9fb 35%,#eef3fb 70%,#fff 100%)' }}>
+      <div className="absolute inset-0 pointer-events-none z-0" style={{
+        backgroundImage: 'linear-gradient(to right,rgba(10,58,140,0.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(10,58,140,0.05) 1px,transparent 1px)',
+        backgroundSize: '56px 56px',
+        backgroundPosition: '-1px -1px',
+        maskImage: 'radial-gradient(ellipse 80% 70% at 50% 30%,#000 40%,transparent 100%)',
+        WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 30%,#000 40%,transparent 100%)',
+      }} />
       <div className="relative z-10 flex flex-col items-center text-center px-5 pt-10 pb-12">
         {/* logo */}
         {logo ? (

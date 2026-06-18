@@ -26,7 +26,7 @@ function FooterLogo({ url, href, width }: { url: string; href: string; width: nu
   if (!url) return null
   const img = (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={url} alt="logo" style={{ height: width, width: 'auto', display: 'block' }} />
+    <img src={url} alt="logo" style={{ height: width, width: 'auto', display: 'block', margin: '0 auto' }} />
   )
   if (href) return <a href={href} target="_blank" rel="noopener noreferrer">{img}</a>
   return img
@@ -148,11 +148,14 @@ function Modelo02Page({ template, ctas, accent, secondary, logoWidth, headline, 
       <style>{`
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Helvetica Neue',Arial,sans-serif;
-          background:linear-gradient(160deg,#eaf1fd 0%,#dbe9fb 35%,#eef3fb 70%,#fff 100%),
-            repeating-linear-gradient(0deg,rgba(10,58,140,0.05) 0px,rgba(10,58,140,0.05) 1px,transparent 1px,transparent 48px),
-            repeating-linear-gradient(90deg,rgba(10,58,140,0.05) 0px,rgba(10,58,140,0.05) 1px,transparent 1px,transparent 48px);
+          background:linear-gradient(160deg,#eaf1fd 0%,#dbe9fb 35%,#eef3fb 70%,#fff 100%);
           color:#0c1b33;min-height:100vh;display:flex;justify-content:center}
-        .wrap{width:100%;max-width:460px;padding:40px 20px 50px;position:relative}
+        .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+          background-image:linear-gradient(to right,rgba(10,58,140,0.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(10,58,140,0.05) 1px,transparent 1px);
+          background-size:56px 56px;background-position:-1px -1px;
+          mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 40%,transparent 100%);
+          -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 40%,transparent 100%)}
+        .wrap{width:100%;max-width:460px;padding:40px 20px 50px;position:relative;z-index:1}
         .logo-shell{margin:8px auto 22px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 18px 32px rgba(10,58,140,0.28))}
         .logo-shell img{width:100%;height:100%;object-fit:contain}
         .handle-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px;font-size:14px}
@@ -182,9 +185,11 @@ function Modelo02Page({ template, ctas, accent, secondary, logoWidth, headline, 
         .card.light .arrow{background:#f1f4fa;color:#5b6b85}
         .card.dark .arrow,.card.accent-card .arrow{background:rgba(255,255,255,0.18);color:#fff}
         .arrow svg{width:16px;height:16px}
-        footer{text-align:center;margin-top:44px;font-size:0.78rem;color:#9aa6ba}
+        footer{text-align:center;margin-top:44px;font-size:0.78rem;color:#9aa6ba;display:flex;flex-direction:column;align-items:center}
         @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
       `}</style>
+
+      <div className="grid-bg" aria-hidden="true" />
 
       <div className="wrap">
         <div className="logo-shell" style={{ width: logoWidth, height: logoWidth }}>
